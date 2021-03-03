@@ -1,0 +1,26 @@
+version: '3.7'
+
+networks:
+  keycloak-network:
+    external:
+      name: keycloak-services
+
+services:
+  keycloak-provisioning:
+    image: keycloak-provisioning
+    environment:
+      LDAP_HOST: openldap
+      LDAP_BIND_DN: "cn=admin,dc=mydomain,dc=de"
+      LDAP_BIND_CREDENTIALS: admin
+      LDAP_USERS_DN: "ou=People,dc=mydomain,dc=de"
+      KEYCLOAK_PROTOCOL: https
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: 8080
+      KEYCLOAK_USERNAME: keyadm
+      KEYCLOAK_PASSWORD: k3Ycl0aK
+      KEYCLOAK_REALM: MyRealm
+      NEXTCLOUD_PROTOCOL: http
+      NEXTCLOUD_HOST: nextcloud.mydomain.de
+      NEXTCLOUD_PORT: 8082
+    networks:
+      - keycloak-network

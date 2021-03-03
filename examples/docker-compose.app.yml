@@ -1,0 +1,86 @@
+version: '3.7'
+
+networks:
+  ldap:
+    name: ldap
+  keycloak-db:
+    name: keycloak-db
+  keycloak-services:
+    name: keycloak-services
+
+services:
+  keycloak:
+    image: jboss/keycloak:12.0.2
+    container_name: keycloak
+    environment:
+      KEYCLOAK_USER: keyadm
+      KEYCLOAK_PASSWORD: k3Ycl0aK
+      DB_VENDOR: mariadb
+      DB_USER: keycloak
+      DB_PASSWORD: k3Ycl0aK-mYsq1
+      DB_DATABASE: keycloak
+    ports:
+      - 8080:8080
+    depends_on:
+      - mariadb
+      - openldap
+    networks:
+      - keycloak-db
+      - ldap
+      - keycloak-services
+
+  mariadb:
+    image: mariadb:10.5.8
+    container_name: mariadb
+    hostname: mariadb
+    restart: unless-stopped
+    volumes:
+      - ./mariadb/var/lib/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mYsq1r0ot
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: k3Ycl0aK-mYsq1
+      MYSQL_DATABASE: keycloak
+    networks:
+      - keycloak-db
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      LDAP_LOG_LEVEL: "256"
+      LDAP_ORGANISATION: "MyOrganization"
+      LDAP_DOMAIN: "mydomain.de"
+      LDAP_BASE_DN: ""
+      LDAP_ADMIN_PASSWORD: "admin"
+      LDAP_CONFIG_PASSWORD: "config"
+      LDAP_READONLY_USER: "false"
+      LDAP_RFC2307BIS_SCHEMA: "false"
+      LDAP_BACKEND: "mdb"
+      LDAP_TLS: "false"
+      LDAP_REPLICATION: "false"
+      KEEP_EXISTING_CONFIG: "false"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
+      LDAP_SSL_HELPER_PREFIX: "ldap"
+    volumes:
+      - ./openldap/var/lib/ldap:/var/lib/ldap
+      - ./openldap/etc/ldap/slapd.d:/etc/ldap/slapd.d
+      - ./openldap/container/service/slapd/assets/certs/:/container/service/slapd/assets/certs/
+    ports:
+      - "389:389"
+      - "636:636"
+    networks:
+      - ldap
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:latest
+    container_name: phpldapadmin
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "openldap"
+      PHPLDAPADMIN_HTTPS: "false"
+    ports:
+      - "8081:80"
+    depends_on:
+      - openldap
+    networks:
+      - ldap
