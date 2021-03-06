@@ -9,35 +9,37 @@ Thus, the bootstrapped realm features:
 * an LDAP user federation, to make LDAP users accessible to services
 * a Nextcloud client, to make these users accessible to Nextcloud
 
-Basically, it templates the described realm with user-provided variables and imports it into a running Keycloak instance
+Basically, it templates the described realm with user-provided variables and imports it into a running Keycloak instance - along with all the LDAP users.
 
 ## Prerequirements
 
-* a basic understanding of the involved services and tools
-* a running application stack (OpenLDAP, Keycloak), e.g. via Docker. see `examples/docker-compose.app.yml`
+* basic understanding of the involved services and tools
+* running application stack (LDAP, Keycloak), e.g. via Docker. see `examples/docker-compose.app.yml`
 * existing LDAP users in an organizational unit. see `examples/ldap-users.ldif`
 
 ## Usage
 
 Adapt the example file `examples/docker-compose.bootstrap.yml` to your needs.
 
-The bootstrapping container and your Keycloak instance must be in the same Docker network.
-Make sure to adapt `keycloak-services`, if you are not using the example application stack file.
+>Note: The bootstrapping container and your Keycloak instance must be in the same Docker network.
+If you are not using the example application stack file, make sure to adapt the external network name (`keycloak-services`).
 
-Check [environment variables](#environment-variables) to see what you might want to change.
+Check [environment variables](#environment-variables) for descriptions and to see what you might want to add.
+
+Once you are finished, bootstrap the realm by running
 
     docker-compose -f examples/docker-compose.bootstrap.yml run --rm keycloak-provisioning
 
 ## Keycloak Provisioning
 
-Bootstrapping this realm simplifies the initial setup process but it is only one step towards fully automated provisioning from static files.
+Bootstrapping your realm simplifies the initial setup process but it is only one step towards fully automated provisioning from static files.
 
-Please note that all examples files make assumptions that may not fit your use case.
+>Note: All examples files make assumptions that may not fit your use case.
 Various environment variables and other lines will have to be adapted.
 
-### Provision your Keycloak
+For a fully automated provisioning, perform the following steps:
 
-1. use this image to bootstrap a Keycloak realm (see `examples/docker-compose.bootstrap.yml`)
+1. use this image to bootstrap a Keycloak realm, as already shown (see `examples/docker-compose.bootstrap.yml`)
 
        docker-compose -f docker-compose.bootstrap.yml run --rm keycloak-provisioning
 
@@ -58,7 +60,7 @@ Various environment variables and other lines will have to be adapted.
 
    wait until the export is finished and then stop the container (Ctrl-C)
 
-6. now you can provisiong your realm to any Keycloak instance, using the Keycloak binary. See `examples/docker-compose.provisioning.yml`.
+6. now you can always provisiong your entire realm to any Keycloak instance, using the Keycloak binary. See `examples/docker-compose.provisioning.yml`.
 
        docker-compose -f docker-compose.provisioning.yml up -d
 
