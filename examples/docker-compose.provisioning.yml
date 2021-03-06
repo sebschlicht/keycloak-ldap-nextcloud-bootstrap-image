@@ -22,7 +22,7 @@ services:
       DB_DATABASE: keycloak
     volumes:
       - ./keycloak-provisioning:/data
-    command: ['-b', '0.0.0.0', '-Dkeycloak.migration.action=import', '-Dkeycloak.migration.provider=dir', '-Dkeycloak.migration.dir=/data', '-Dkeycloak.migration.strategy=OVERWRITE_EXISTING', '-Dkeycloak.migration.realmName=MyRealm']
+    command: ['-b', '0.0.0.0', '-Dkeycloak.migration.action=import', '-Dkeycloak.migration.provider=dir', '-Dkeycloak.migration.dir=/data', '-Dkeycloak.migration.strategy=OVERWRITE_EXISTING']
     ports:
       - 8080:8080
     networks:

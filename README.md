@@ -11,7 +11,7 @@ Thus, the bootstrapped realm features:
 
 Basically, it templates the described realm with user-provided variables and imports it into a running Keycloak instance - along with all the LDAP users.
 
-## Prerequirements
+## Prerequisites
 
 * basic understanding of the involved services and tools
 * running application stack (LDAP, Keycloak), e.g. via Docker. see `examples/docker-compose.app.yml`
