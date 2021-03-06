@@ -30,6 +30,9 @@ Once you are finished, bootstrap the realm by running
 
     docker-compose -f examples/docker-compose.bootstrap.yml run --rm keycloak-provisioning
 
+While Keycloak is now ready to serve, you still have to setup Nextcloud to use Keycloak.
+Check [resources](#resources) to see how.
+
 ## Keycloak Provisioning
 
 Bootstrapping your realm simplifies the initial setup process but it is only one step towards fully automated provisioning from static files.
