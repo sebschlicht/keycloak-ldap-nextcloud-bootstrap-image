@@ -1,4 +1,4 @@
-# LDAP-Keycloak-Nextcloud Keycloak Boostrap Image
+# Keycloak Bootstrap Image for LDAP-Keycloak-Nextcloud setup
 
 This Docker image allows to bootstrap the provisioning of Keycloak from file.
 
