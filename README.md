@@ -2,22 +2,26 @@
 
 This Docker image allows to bootstrap the provisioning of Keycloak from file.
 
-Its main purpose is to provide a starting point for connecting Nextcloud with LDAP, via Keycloak.
+Its main purpose is to provide a starting point for connecting Nextcloud with LDAP, via Keycloak, using SAML.
 
-Thus, the bootstrapped realm features:
+Thus, it bootstrapps a single realm into a running Keycloak instance that features:
 
 * an LDAP user federation, to make LDAP users accessible to services
 * a Nextcloud client, to make these users accessible to Nextcloud
 
-Basically, it templates the described realm with user-provided variables and imports it into a running Keycloak instance - along with all the LDAP users.
+When following this guide, you can learn how to permanently provision LDAP and Keycloak.
 
 ## Prerequisites
 
 * basic understanding of the involved services and tools
-* running application stack (LDAP, Keycloak), e.g. via Docker. see `examples/docker-compose.app.yml`
-* existing LDAP users in an organizational unit. see `examples/ldap-users.ldif`
+* running application stack (LDAP, Keycloak, Nextcloud), e.g. via Docker. see `examples/docker-compose.app.yml`
+* existing LDAP users in an organizational unit (provisioned when using `examples/docker-compose.app.yml`)
 
 ## Usage
+
+Generate a new X.509 key pair for the Nextcloud SAML client:
+
+    openssl req  -nodes -new -x509  -keyout private.key -out public.cert
 
 Adapt the example file `examples/docker-compose.bootstrap.yml` to your needs.
 
@@ -30,8 +34,8 @@ Once you are finished, bootstrap the realm by running
 
     docker-compose -f examples/docker-compose.bootstrap.yml run --rm keycloak-provisioning
 
-While Keycloak is now ready to serve, you still have to setup Nextcloud to use Keycloak.
-Check [resources](#resources) to see how.
+While Keycloak is now ready to serve, you still have to configure Nextcloud to use Keycloak, using the key pair that you created in the first step.
+Follow the instructions in the section `Configure Nextcloud` of [this excellent guide](https://stackoverflow.com/questions/48400812/sso-with-saml-keycloak-and-nextcloud) to see how.
 
 ## Keycloak Provisioning
 
@@ -86,6 +90,13 @@ KEYCLOAK_REALM        | -         | name of the resulting realm
 NEXTCLOUD_PROTOCOL    | https     | protocol for Nextcloud URLs
 NEXTCLOUD_HOST        | nextcloud | hostname / IP address of the Nextcloud machine
 NEXTCLOUD_PORT        | 443       | port to reach Nextcloud on the specified host
+
+## LDAP Provisioning
+
+LDAP is already provisioned in this example, using the Docker image's ability to bootstrap LDIF files from mounted volumes.
+Make sure to keep the `--copy-service` flag or you will run into file permissions issues.
+
+To create a valid provisioning file, export your DN to an LDIF file via *phpldapadmin* but remove the base DN entry (i.e. the first).
 
 ## Resources
 

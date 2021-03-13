@@ -13,14 +13,16 @@ services:
       LDAP_BIND_DN: "cn=admin,dc=mydomain,dc=de"
       LDAP_BIND_CREDENTIALS: admin
       LDAP_USERS_DN: "ou=People,dc=mydomain,dc=de"
-      KEYCLOAK_PROTOCOL: https
-      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PROTOCOL: http
+      KEYCLOAK_HOST: keycloak.mydomain.de
       KEYCLOAK_PORT: 8080
       KEYCLOAK_USERNAME: keyadm
       KEYCLOAK_PASSWORD: k3Ycl0aK
       KEYCLOAK_REALM: MyRealm
-      NEXTCLOUD_PROTOCOL: http
+      NEXTCLOUD_PROTOCOL: https
       NEXTCLOUD_HOST: nextcloud.mydomain.de
       NEXTCLOUD_PORT: 8082
+    volumes:
+      - /path/to/X.509/public.cert:/certificates/nextcloud.cert
     networks:
       - keycloak-network

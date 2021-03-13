@@ -7,6 +7,10 @@ networks:
     name: keycloak-db
   keycloak-services:
     name: keycloak-services
+  nextcloud-db:
+    name: nextcloud-db
+  nextcloud-services:
+    name: nextcloud-services
 
 services:
   keycloak:
@@ -47,25 +51,22 @@ services:
   openldap:
     image: osixia/openldap:1.5.0
     container_name: openldap
+    command: [ "--copy-service" ]
     environment:
-      LDAP_LOG_LEVEL: "256"
-      LDAP_ORGANISATION: "MyOrganization"
-      LDAP_DOMAIN: "mydomain.de"
-      LDAP_BASE_DN: ""
+      LDAP_LOG_LEVEL: 256
+      LDAP_ORGANISATION: MyOrganization
+      LDAP_DOMAIN: mydomain.de
       LDAP_ADMIN_PASSWORD: "admin"
       LDAP_CONFIG_PASSWORD: "config"
-      LDAP_READONLY_USER: "false"
       LDAP_RFC2307BIS_SCHEMA: "false"
-      LDAP_BACKEND: "mdb"
+      LDAP_BACKEND: mdb
       LDAP_TLS: "false"
       LDAP_REPLICATION: "false"
-      KEEP_EXISTING_CONFIG: "false"
-      LDAP_REMOVE_CONFIG_AFTER_SETUP: "true"
-      LDAP_SSL_HELPER_PREFIX: "ldap"
     volumes:
       - ./openldap/var/lib/ldap:/var/lib/ldap
       - ./openldap/etc/ldap/slapd.d:/etc/ldap/slapd.d
       - ./openldap/container/service/slapd/assets/certs/:/container/service/slapd/assets/certs/
+      - ./ldap-provisioning-users.ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom/users.ldif
     ports:
       - "389:389"
       - "636:636"
@@ -84,3 +85,38 @@ services:
       - openldap
     networks:
       - ldap
+
+  nextcloud-mariadb:
+    image: mariadb
+    container_name: nextcloud-mariadb
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - ./nextcloud-mariadb/var/lib/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=tormysl
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=mYn3tcl0Ud
+      - MYSQL_DATABASE=nextcloud
+    networks:
+      - nextcloud-db
+
+  nextcloud:
+    image: nextcloud:21.0-apache
+    container_name: nextcloud
+    restart: always
+    ports:
+      - 8082:80
+    volumes:
+      - ./nextcloud/www-data:/var/www/html
+    environment:
+      MYSQL_HOST: nextcloud-mariadb
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: mYn3tcl0Ud
+      MYSQL_DATABASE: nextcloud
+      NEXTCLOUD_ADMIN_USER: ncadm
+      NEXTCLOUD_ADMIN_PASSWORD: n3xt4Dm
+    networks:
+      - keycloak-services
+      - nextcloud-db
+      - nextcloud-services

@@ -1,4 +1,4 @@
-# LDIF Export for dc=mydomain,dc=de
+# LDIF Export for {{ LDAP_BASE_DN }}
 # Server: openldap (openldap)
 # Search Scope: sub
 # Search Filter: (objectClass=*)
@@ -9,24 +9,16 @@
 
 version: 1
 
-# Entry 1: dc=mydomain,dc=de
-dn: dc=mydomain,dc=de
-dc: mydomain
-o: MyOrganization
-objectclass: top
-objectclass: dcObject
-objectclass: organization
-
-# Entry 2: ou=People,dc=mydomain,dc=de
-dn: ou=People,dc=mydomain,dc=de
+# Entry 2: ou=People,{{ LDAP_BASE_DN }}
+dn: ou=People,{{ LDAP_BASE_DN }}
 objectclass: organizationalUnit
 objectclass: top
 ou: People
 
-# Entry 3: uid=full,ou=People,dc=mydomain,dc=de
-dn: uid=full,ou=People,dc=mydomain,dc=de
+# Entry 3: uid=full,ou=People,{{ LDAP_BASE_DN }}
+dn: uid=full,ou=People,{{ LDAP_BASE_DN }}
 cn: Test
-mail: full@mydomain.de
+mail: full@{{ LDAP_DOMAIN }}
 objectclass: inetOrgPerson
 objectclass: top
 sn: Full

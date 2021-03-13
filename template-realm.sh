@@ -1,6 +1,22 @@
 #!/bin/bash
 
 keycloak_endpoint="$KEYCLOAK_PROTOCOL://$KEYCLOAK_HOST:$KEYCLOAK_PORT"
+echo "$keycloak_endpoint"
+
+load_x509_certificates () {
+    local certificate_folder="$1"
+
+    local nextcloud_certificate_file="$certificate_folder/nextcloud.cert"
+    if [ -r "$nextcloud_certificate_file" ]; then
+        local client_certificate
+        client_certificate="$( tail -n +2 "$nextcloud_certificate_file" | head -n -1 | tr -d '\n' )"
+
+        export NEXTCLOUD_CLIENT_CERTIFICATE="$client_certificate"
+    else
+        echo "Failed to load X.509 certificate from file '$nextcloud_certificate_file'!"
+        return 1
+    fi
+}
 
 template_file () {
     local source="$1"
@@ -67,6 +83,9 @@ sync_all_ldap_users () {
 # template realm
 realm_file_template=realm.tpl.json
 realm_file=realm.json
+if ! load_x509_certificates "/certificates"; then
+    exit 1
+fi
 template_file "$realm_file_template" "$realm_file"
 realm="$( extract_realm_name "$realm_file" )"
 
